@@ -28,10 +28,10 @@ jobs:
       - name: upload artifacts
         uses: actions/upload-artifact@v3
         with: 
-           name: dist-files
-           path:  | #pipe
-              dist
-              package.json
+          name: 
+          path:  | #pipe
+             dist
+             package.json
   deploy:
     needs: build
     runs-on: ubuntu-latest
