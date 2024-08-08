@@ -31,7 +31,7 @@ jobs :                          #Contains the individual jobs that run as part o
             - name: Get code                    # action to check out the repository code
               uses: actions/checkout@v4
             - name : Install dependencies
-              uses: actions/cache@v3
+              uses: actions/cache@v4
               with:
                  path: ~/.npm
                  key: deps-node-modules-${{ hashFiles('**/package-lock.json')}}
@@ -42,6 +42,7 @@ jobs :                          #Contains the individual jobs that run as part o
             - name:  Publish JS filename
               id : publish
               run:   find dist/assets/*.js -type f -execdir echo '::set-output name=script-file::{}'  ';'
+              run: echo "script-file=$(find dist/assets/*.js -type f)" >> $GITHUB_ENV
             - name:  Upload artifacts             #Uses the actions/upload-artifact@v3 action to upload the build artifacts. The with section specifies the artifact name (dist-files) and the paths to include (dist and package.json)
               uses : actions/upload-artifact@v4
               with:
