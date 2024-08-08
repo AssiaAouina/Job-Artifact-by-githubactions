@@ -30,20 +30,14 @@ jobs :                          #Contains the individual jobs that run as part o
               uses : actions/upload-artifact@v4
               with:
                   name: dist-files
-                  path: dist
-                                           # dist
-                                          #package.json
+                  path: |
+                   dist
+                   package.json
   deploy:
-        needs: build                       #Sepecifies that this job should only run after the 'buils' job is successful
+        needs: build
         runs-on: ubuntu-latest
-        steps:                                 # series of commands or actions to execute
-           - name:  Get build artifacts        
-             uses:  actions/download-artifact@v4   # Uses actions/download-artifact to retrieve the previously uploaded build artifacts
-             with:
-               name: dist-files
-           - name: Output contents                 #Lists the contents of the current directory (useful for debugging purposes).
-             run:  ls
-           - name: Deploy                          # the deployment step (should be replaced with actual deployment commands).
+        steps:
+           - name: Deploy
              run : echo "Deploy"
 
 
