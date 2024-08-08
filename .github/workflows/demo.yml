@@ -31,7 +31,7 @@ jobs :                          #Contains the individual jobs that run as part o
               run :  npm run build
             - name:  Publish JS filename
               id : publish
-              run:   find dist\assets\*.js -type f -execdir echo '::set-output name=script-file::{}'  ';'
+              run:   find dist/assets/*.js -type f -execdir echo '::set-output name=script-file::{}'  ';'
             - name:  Upload artifacts             #Uses the actions/upload-artifact@v3 action to upload the build artifacts. The with section specifies the artifact name (dist-files) and the paths to include (dist and package.json)
               uses : actions/upload-artifact@v4
               with:
