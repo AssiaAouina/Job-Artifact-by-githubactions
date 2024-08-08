@@ -1,5 +1,5 @@
 name:  Deploy website  #Specifies the name of the workflow
-on:                           #Specifies the events that trigger the workflow 
+on:                          #Specifies the events that trigger the workflow 
   workflow_dispatch:          # Allows you to manually trigger the workflow from the GitHub Actions interface.
   push:                       #Triggers the workflow on a push event, specifically to the master branch
     branches: 
@@ -17,28 +17,42 @@ jobs :                          #Contains the individual jobs that run as part o
          - name: test
            run: npm run test               #npm run test
   build:                                    #The name of the second job, which builds the website
-       needs: test
-       runs-on: ubuntu-latest                # Specifies the environment to run the job 
-       steps :                                 # the series of the steps to execute in this job 
+       needs: test                          # Specifies the environment to run the job 
+                                      # the series of the steps to execute in this job 
+       runs-on: ubuntu-latest   
+       outputs:
+          script-file: ${{ steps.publish.outputs.script-file }}
+       steps :         
             - name: Get code                    # action to check out the repository code
               uses: actions/checkout@v4
             - name : Install dependencies
               run: npm ci
             - name : Build website
               run :  npm run build
+            - name:  Publish JS filename
+              id : publish
+              run:   find dist\assets\*.js -type f -execdir echo '::set-output name=script-file::{}'  ';'
             - name:  Upload artifacts             #Uses the actions/upload-artifact@v3 action to upload the build artifacts. The with section specifies the artifact name (dist-files) and the paths to include (dist and package.json)
               uses : actions/upload-artifact@v4
               with:
                   name: dist-files
-                  path: |
-                   dist
-                   package.json
+                  path: dist
+                                           # dist
+                                          #package.json
   deploy:
-        needs: build
+        needs: build                       #Sepecifies that this job should only run after the 'buils' job is successful
         runs-on: ubuntu-latest
-        steps:
-           - name: Deploy
-             run : echo "Deploy"
+        steps:                                 # series of commands or actions to execute
+          - name:  Get build artifacts        
+            uses:  actions/download-artifact@v4   # Uses actions/download-artifact to retrieve the previously uploaded build artifacts
+            with:
+              name: dist-files
+          - name: Output contents                 #Lists the contents of the current directory (useful for debugging purposes).
+            run:  ls
+          - name: Output filename
+            run: echo "${{ needs.build.outputs.script-file}}"
+          - name: Deploy                          # the deployment step (should be replaced with actual deployment commands).
+            run : echo "Deploy"
 
 
                  
