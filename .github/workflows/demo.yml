@@ -1,32 +1,32 @@
-name:  Deploy website
-on:
-  workflow_dispatch:
-  push:
+name:  Deploy website  #Specifies the name of the workflow
+on:                          #Specifies the events that trigger the workflow 
+  workflow_dispatch:          # Allows you to manually trigger the workflow from the GitHub Actions interface.
+  push:                       #Triggers the workflow on a push event, specifically to the master branch
     branches: 
       - master
-jobs :
-  test:
-      runs-on: ubuntu-latest
-      steps:
-         - name : Get code
-           uses:  actions/checkout@v4
-         - name : Install dependencies
+jobs :                          #Contains the individual jobs that run as part of the workflow.
+  test:                           # The name of the first job, which runs tests on the code
+      runs-on: ubuntu-latest         #Specifies the environment to run the job on, in this case, ubuntu-latest.
+      steps:                        #The series of steps to execute in this job
+         - name : Get code           
+           uses:  actions/checkout@v4    # action to check out the repository code. 
+         - name : Install dependencies    #to install dependencies defined in package-lock.json.
            run: npm ci
-         - name : Lint code
-           run : npm run lint
+         - name : Lint code                # npm run lint to lint the code
+           run : npm run lint             
          - name: test
-           run: npm run test
-  build:
+           run: npm run test               #npm run test
+  build:                                    #The name of the second job, which builds the website
        needs: test
-       runs-on: ubuntu-latest
-       steps :
-            - name: Get code
+       runs-on: ubuntu-latest                # Specifies the environment to run the job 
+       steps :                                 # the series of the steps to execute in this job 
+            - name: Get code                    # action to check out the repository code
               uses: actions/checkout@v4
             - name : Install dependencies
               run: npm ci
             - name : Build website
               run :  npm run build
-            - name:  Upload artifacts
+            - name:  Upload artifacts             #Uses the actions/upload-artifact@v3 action to upload the build artifacts. The with section specifies the artifact name (dist-files) and the paths to include (dist and package.json)
               uses : actions/upload-artifact@v4
               with:
                   name: dist-files
