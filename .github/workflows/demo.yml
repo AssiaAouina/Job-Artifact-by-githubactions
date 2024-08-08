@@ -9,7 +9,12 @@ jobs :                          #Contains the individual jobs that run as part o
       runs-on: ubuntu-latest         #Specifies the environment to run the job on, in this case, ubuntu-latest.
       steps:                        #The series of steps to execute in this job
          - name : Get code           
-           uses:  actions/checkout@v4    # action to check out the repository code. 
+           uses:  actions/checkout@v4   # action to check out the repository code. 
+         - name:  Cache dependencies
+           uses: actions/cache@v3
+           with:
+              path: ~/.npm
+              key: deps-node-modules-${{ hashFiles('**/package-lock.json')}}
          - name : Install dependencies    #to install dependencies defined in package-lock.json.
            run: npm ci
          - name : Lint code                # npm run lint to lint the code
@@ -26,19 +31,23 @@ jobs :                          #Contains the individual jobs that run as part o
             - name: Get code                    # action to check out the repository code
               uses: actions/checkout@v4
             - name : Install dependencies
+              uses: actions/cache@v3
+              with:
+                 path: ~/.npm
+                 key: deps-node-modules-${{ hashFiles('**/package-lock.json')}}
+            - name : Install dependencies 
               run: npm ci
             - name : Build website
               run :  npm run build
             - name:  Publish JS filename
               id : publish
-              run:   find dist\assets\*.js -type f -execdir echo '::set-output name=script-file::{}'  ';'
+              run:   find dist/assets/*.js -type f -execdir echo '::set-output name=script-file::{}'  ';'
             - name:  Upload artifacts             #Uses the actions/upload-artifact@v3 action to upload the build artifacts. The with section specifies the artifact name (dist-files) and the paths to include (dist and package.json)
               uses : actions/upload-artifact@v4
               with:
-                  name: dist-files
-                  path: dist
-                                           # dist
-                                          #package.json
+                  name: dist-files               # dist
+                  path: dist                         #package.json
+                                           
   deploy:
         needs: build                       #Sepecifies that this job should only run after the 'buils' job is successful
         runs-on: ubuntu-latest
